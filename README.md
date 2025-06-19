@@ -1,55 +1,109 @@
-DTPScan
-========
+Understood. Here's the complete `README.md` content — **no formatting, no split** — just copy and paste it as-is:
 
-Detects DTP modes for VLAN Hopping (passive check)
+````markdown
+# DTPScan (PowerShell Port for Windows)
 
-DTPscan will passively sniff the network and detect which switchport mode the switch is configured in to assist with VLAN hopping attacks.
+**DTPScan** is a Windows PowerShell port of the original Bash-based VLAN DTP scanner by Daniel Compton. It passively listens for Dynamic Trunking Protocol (DTP) packets to detect VLAN hopping vulnerabilities on Cisco switches.
 
-Frogger script can be used to actively attack DTP in an attempt to VLAN hop, but until now the only real way to tell was to review the Cisco switch config file to see how the port is configured to know if it is possible.
+This version works entirely on Windows and uses `tshark` (included with Wireshark) for packet sniffing.
 
-This will detect the hex code from DTP and know which mode the switch port is in and give you a result to say if VLAN hopping is possible. As this is passive (does not attack DTP) this is very useful to know it advance.
+---
 
+## ⚡ Features
 
-* This will be a feature of Frogger version 2 soon -  releasing DTPscan for now. Frogger 2 will have major changes and will support passive gathering, active attacks and will support ISL as well as 802.1Q.
+- Sniffs DTP traffic to identify trunking mode
+- Detects `auto`, `desirable`, `trunk`, `access`, and other common DTP states
+- Fully passive — no packets are sent
+- CLI-only, suitable for security assessments and red team labs
 
+---
 
-Developed by Daniel Compton
+## 🛠 Requirements
 
-https://github.com/commonexploits/dtpscan
+- **Wireshark** installed with `tshark` (CLI capture tool)
+- PowerShell (tested on Windows 10/11 with PowerShell 5.1+)
+- Admin privileges (to capture packets from interfaces)
 
-Released under AGPL see LICENSE for more information
+---
 
+## 🔧 Installation
 
-Installing
-========
+1. Install [Wireshark](https://www.wireshark.org/download.html)
+   - Ensure you check **"Install TShark"** during setup
+   - Also install **Npcap** when prompted
 
-    git clone https://github.com/commonexploits/dtpscan.git
+2. Add Wireshark to your system `PATH`:
+   - Add this to your `PATH` if not already:
+     ```
+     C:\Program Files\Wireshark
+     ```
 
-How To Use
-========
+3. Clone this repository:
+   ```powershell
+   git clone https://github.com/SwampSec/dtpscan-windows.git
+   cd dtpscan-windows
+   ```
 
-    ./dtpscan.sh
+---
 
+## 🚀 Usage
 
-Features
-========
+1. Open **PowerShell as Administrator**
+2. Run the script:
+   ```powershell
+   .\DTPScan.ps1
+   ```
+3. When prompted, choose the correct interface number (you can run `tshark -D` to list them ahead of time)
 
-* Passively detects the DTP mode of a Cisco switch for VLAN hopping
-* Reports if switch is in Default mode, trunk, dynamic, auto or access mode
+---
 
-Screen Shots
-========
+## 📡 Example Output
 
-![](http://commonexploits.com/wp-content/uploads/2013/09/dtp1.jpg)
+```
+[+] DTP was found enabled in mode 'switchport mode dynamic desirable'.
+[+] VLAN hopping should be possible.
+```
 
-![](http://commonexploits.com/wp-content/uploads/2013/09/dtp2.jpg)
+If DTP is not detected:
+```
+[!] No DTP packets were found. DTP is probably disabled and in 'switchport nonegotiate' mode.
+```
 
-![](http://commonexploits.com/wp-content/uploads/2013/09/dtp3.jpg)
+---
 
+## ✅ DTP Mode Codes Detected
 
-Change Log
-========
-* Version 1.3 - Small message typo in output fixed.
-* Version 1.2 - Fixed script. Updates to tshark caused script to break. 
-* Version 1.1 - Updated working
-* Version 1.0 - First release. * it may need to work on some of the DTP codes/modes with more testing.
+| DTP Mode Code | Meaning                                      | VLAN Hopping?        |
+|---------------|----------------------------------------------|-----------------------|
+| 0x03          | Dynamic Auto (default)                       | ✅ Possible           |
+| 0x83 / 0x04   | Dynamic Desirable                            | ✅ Possible           |
+| 0x84          | Dynamic Auto                                 | ✅ Possible           |
+| 0x81          | Trunk                                        | ❌ Not Possible       |
+| 0x02          | Access                                       | ❌ Not Possible       |
+| 0xa5          | Trunk (802.1Q encapsulation forced)          | ❌ Not Possible       |
+| 0x42          | Trunk (ISL encapsulation forced)             | ❌ Not Possible       |
+
+---
+
+## 🧪 Notes
+
+- This script **only tests the port you're connected to**
+- Just because one port blocks DTP doesn't mean others do
+- Useful in red team or lab environments to validate switch misconfigurations
+
+---
+
+## 🔒 Legal Disclaimer
+
+This tool is intended for **educational and authorized security testing** purposes only.  
+**Unauthorized use on networks you do not own or have permission to test is strictly prohibited.**
+
+---
+
+## 🙏 Credit
+
+- Original Bash Script by: [Daniel Compton](https://www.commonexploits.com)
+- PowerShell Port by: [SwampSec](https://github.com/SwampSec)
+````
+
+Paste that directly into your `README.md` file. You're good to go.
